@@ -157,7 +157,7 @@
         const OPERATIONAL_MAP = [
             { id: "Female Dorm", anchors: ["Female Dorm", "Female-Only"] },
             { id: "Budget Dorm", anchors: ["Bunk Bed in Mixed Dormitory", "Basic 8 Bed Mixed"] },
-            { id: "Standard Dorm", anchors: ["Single Bed in Mixed Dormitory", "Standard 8 Bed Mixed"] },
+            { id: "Standard Dorm", anchors: ["Single Bed in Mixed Dormitory", "Standard 8 Bed Mixed Dorm"] },
             { id: "Superior Dorm", anchors: ["Single Bed in Dormitory Room", "Deluxe 8 Bed Mixed"] },
             { id: "Dorm for Private Use", anchors: ["8-Bed Mixed Dormitory Room", "Superior 8 Bed Family"] },
             { id: "Chill Dorm", anchors: ["Superior 8 Bed Mixed"] }
@@ -198,18 +198,15 @@
             let nights = parseInt(nightsEl.value) || 1;
 
             if (type === 'in') {
-                // If user changes IN, keep the number of nights same, move OUT forward
                 const newOut = new Date(cin);
                 newOut.setDate(cin.getDate() + nights);
                 coutEl.value = fDate(newOut);
             } else if (type === 'nights') {
-                // If user changes nights, keep IN, move OUT
                 if (nights < 1) nights = 1;
                 const newOut = new Date(cin);
                 newOut.setDate(cin.getDate() + nights);
                 coutEl.value = fDate(newOut);
             } else if (type === 'out') {
-                // If user changes OUT, keep IN, update nights
                 if (cout <= cin) {
                     const nextDay = new Date(cin);
                     nextDay.setDate(cin.getDate() + 1);
@@ -249,7 +246,6 @@
                         const prices = [...chunk.matchAll(/THB\s*([\d,.]+)/gi)].map(p => parseFloat(p[1].replace(/,/g, '')));
                         
                         if (prices.length > 0) {
-                            // Find the minimum price in this specific block
                             const minValInBlock = Math.min(...prices);
                             const total = isHW ? (minValInBlock * stayNights) : minValInBlock;
                             const finalPrice = Math.round(total);
@@ -257,7 +253,6 @@
                             if (!comparisonState[room.id]) comparisonState[room.id] = {};
                             const currentBest = comparisonState[room.id][isHW ? 'hw' : 'booking'] || 9e9;
                             
-                            // CHEAPEST PRICE LOGIC: Only update if the new price is lower than what we already have for this room
                             comparisonState[room.id][isHW ? 'hw' : 'booking'] = Math.min(currentBest, finalPrice);
                         }
                     }
@@ -294,12 +289,8 @@
             container.innerHTML = ''; container.classList.remove('hidden');
 
             let text = rawText;
-            if (text.includes("Things to do in Haad Rin")) {
-                const parts = text.split("Things to do in Haad Rin");
-                const afterAds = parts[1].split("Load more results")[1] || "";
-                text = parts[0] + afterAds;
-            }
             
+            // Cleanup the footer to prevent duplicate items from "Recently viewed" stealing prices
             if (text.includes("Available properties you recently viewed")) {
                 text = text.split("Available properties you recently viewed")[0];
             } else if (text.includes("Recently viewed")) {
@@ -321,18 +312,23 @@
                     if (name && prices.length > 0) results.push({ name, price: Math.min(...prices) });
                 });
             } else {
+                // Booking.com Analysis Logic: Process full string to avoid 25-item limit
                 const segments = text.split("Opens in new window");
                 for (let i = 0; i < segments.length - 1; i++) {
                     const nameBlock = segments[i].trim().split('\n');
                     const name = nameBlock[nameBlock.length - 1].trim();
+
+                    // Validation to ensure it's a property and skip ads/sidebar items
                     if (name.includes('Safari') || name.includes('Experience') || name.includes('Tour') || 
                         name.includes('Things to do') || name.includes('Tickets') || name.length < 3) continue;
 
                     let dataBlock = segments[i+1];
+                    // Isolation: Terminate price search if hitting the ad header within this card segment
                     if (dataBlock.includes("Things to do in Haad Rin")) {
                         dataBlock = dataBlock.split("Things to do in Haad Rin")[0];
                     }
 
+                    // Look for numbers without "+" (ignore taxes) and grab the absolute minimum
                     const matches = [...dataBlock.matchAll(/(?<!\+)\s*THB\s*([\d,.]+)/gi)];
                     
                     if (name && matches.length > 0) {
@@ -381,7 +377,7 @@
                 const hw = `https://www.hostelworld.com/pwa/s?q=Koh%20Phangan,%20Thailand&country=Thailand&city=Koh%20Phangan&type=city&id=2017&from=${cinS}&to=${coutS}&guests=${gst}&district=232&page=1&sort=lowestprice`;
                 const row = document.createElement('div');
                 row.className = 'flex items-center gap-1 bg-slate-900 border border-slate-700 p-0.5 px-1 rounded-lg shadow-sm';
-                row.innerHTML = `<div class="w-10 font-black text-pink-500 text-xl leading-none">${p.label}</div><div class="flex-grow text-slate-400 text-base font-black font-mono text-center border-l border-slate-800">${cinS.slice(5)} to ${coutS.slice(5)}</div><div class="flex gap-1"><a href="${bcom}" target="_blank" onclick="prepParserFocus('auditArea')" class="w-14 py-1 bg-blue-600 rounded text-[10px] text-white font-black uppercase leading-none text-center">B.com</a><a href="${hw}" target="_blank" onclick="prepParserFocus('auditArea')" class="w-14 py-1 bg-orange-600 rounded text-[10px] text-white font-black uppercase leading-none text-center">HW</a></div>`;
+                row.innerHTML = `<div class="w-10 font-black text-pink-500 text-xl leading-none">${p.label}</div><div class="flex-grow text-slate-400 text-base font-black font-mono text-center border-l border-slate-800">${cinS.slice(5)} to ${coutS.slice(5)}</div><div class="flex gap-1"><a href="${bcom}" target="_blank" onclick="prepParserFocus('auditArea')" class="w-14 py-1 bg-blue-600 rounded text-[10px] text-white font-black uppercase leading-none text-center">B.com</a><a href="${hw}" target="_blank" onclick="prepParserFocus('auditArea')" class="w-14 py-1 bg-orange-600 rounded text-[10px] text-white font-black uppercase text-center">HW</a></div>`;
                 container.appendChild(row);
             });
         }
