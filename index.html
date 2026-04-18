@@ -46,7 +46,7 @@
             <button onclick="switchTab('audit')" id="tab-audit" class="flex-1 py-3 font-black text-sm uppercase tracking-widest tab-inactive">Market Audit</button>
         </div>
 
-        <!-- TAB 1: QUOTE -->
+        <!-- TAB 1: QUOTE SECTION -->
         <div id="view-quote" class="block space-y-3">
             <div class="glass-card rounded-xl p-2">
                 <div class="grid grid-cols-12 gap-2 items-end">
@@ -114,7 +114,7 @@
             </div>
         </div>
 
-        <!-- TAB 2: AUDIT -->
+        <!-- TAB 2: AUDIT & MATRIX SECTION -->
         <div id="view-audit" class="hidden space-y-4">
             <div class="glass-card rounded-xl border border-pink-500/20 overflow-hidden">
                 <div class="px-3 py-1 bg-pink-900/20 border-b border-pink-500/30 flex justify-between items-center">
@@ -165,7 +165,6 @@
 
         let comparisonState = {};
         let stayNights = 1;
-
         const fDate = (date) => {
             const y = date.getFullYear();
             const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -195,8 +194,7 @@
         }
 
         function handleDateChange(type) {
-            const cinEl = document.getElementById('checkin');
-            const coutEl = document.getElementById('checkout');
+            const cinEl = document.getElementById('checkin'), coutEl = document.getElementById('checkout');
             const nightsEl = document.getElementById('nights');
             let cin = new Date(cinEl.value), cout = new Date(coutEl.value);
             let nights = parseInt(nightsEl.value) || 1;
@@ -284,8 +282,12 @@
             if (!rawText) return;
             container.innerHTML = ''; container.classList.remove('hidden');
 
-            // 1. FOOTER CLEANUP: Strip "Recently viewed" to prevent duplicates stealing prices
-            let text = rawText.split(/Available properties you recently viewed|Recently viewed/i)[0];
+            let text = rawText;
+            if (text.includes("Available properties you recently viewed")) {
+                text = text.split("Available properties you recently viewed")[0];
+            } else if (text.includes("Recently viewed")) {
+                text = text.split("Recently viewed")[0];
+            }
 
             const results = [];
             const isHW = text.toLowerCase().includes("hostelworld") || text.toLowerCase().includes("dorms from");
@@ -299,40 +301,40 @@
                     if (!isNaN(name) || name.length < 3) name = lines[1]?.trim() || "Unknown";
                     if (name.includes('Tour') || name.includes('Experience') || name.includes('Safari') || block.includes('Tickets from')) return;
                     const prices = [...block.matchAll(/(?<!\+)\s*THB\s*([\d,.]+)/gi)].map(p => parseFloat(p[1].replace(/,/g, '')));
-                    if (name && prices.length > 0) results.push({ name, price: Math.min(...prices) });
+                    if (name && prices.length > 0) results.push({ name, price: Math.min(...prices) * (window.auditNights || 1) });
                 });
             } else {
-                // 2. SEGMENT-BASED BOOKING.COM PARSING (FIXES 25-RESULT LIMIT)
+                // Booking.com split logic isolates properties by the "Opens in new window" label
                 const segments = text.split("Opens in new window");
-                
                 for (let i = 0; i < segments.length - 1; i++) {
-                    const namePart = segments[i].trim();
-                    const nameLines = namePart.split('\n');
-                    const name = nameLines[nameLines.length - 1].trim();
+                    const nameBlock = segments[i].trim().split('\n');
+                    const name = nameBlock[nameBlock.length - 1].trim();
 
-                    // Skip ads and non-property text
-                    if (name.length < 3 || /Safari|Experience|Tour|Things to do|Tickets|reviews|Show on map/i.test(name)) continue;
+                    if (name.includes('Safari') || name.includes('Experience') || name.includes('Tour') || 
+                        name.includes('Things to do') || name.includes('Tickets') || name.length < 3) continue;
 
-                    let priceWindow = segments[i+1];
-                    
-                    // 3. AD-BREAK PROTECTION: Cut the price search if it hits the ad section
-                    if (priceWindow.includes("Things to do in Haad Rin")) {
-                        priceWindow = priceWindow.split("Things to do in Haad Rin")[0];
+                    let dataBlock = segments[i+1];
+                    if (dataBlock.includes("Things to do in Haad Rin")) {
+                        dataBlock = dataBlock.split("Things to do in Haad Rin")[0];
                     }
 
-                    // Extract all valid prices (discounted/lowest)
-                    const matches = [...priceWindow.matchAll(/(?<!\+)\s*THB\s*([\d,.]+)/gi)];
-                    if (matches.length > 0) {
-                        const foundPrices = matches.map(p => parseFloat(p[1].replace(/,/g, '')));
-                        results.push({ name, price: Math.min(...foundPrices) });
+                    const matches = [...dataBlock.matchAll(/(?<!\+)\s*THB\s*([\d,.]+)/gi)];
+                    
+                    if (name && matches.length > 0) {
+                        const prices = matches.map(p => parseFloat(p[1].replace(/,/g, '')));
+                        const cheapest = Math.min(...prices);
+                        results.push({ name, price: cheapest });
                     }
                 }
             }
 
-            const seen = new Set();
+            const seenNames = new Set();
             results.sort((a,b) => a.price - b.price).forEach(item => {
-                if (seen.has(item.name)) return; seen.add(item.name);
-                const isWET = /wet pool|wet!/i.test(item.name);
+                if (seenNames.has(item.name)) return;
+                seenNames.add(item.name);
+                
+                const lowerName = item.name.toLowerCase();
+                const isWET = lowerName.includes('wet pool') || lowerName.includes('wet!');
                 const row = document.createElement('div');
                 row.className = `flex justify-between p-1.5 px-2 border border-slate-800 rounded text-sm mb-1 ${isWET ? 'bg-pink-900/30 border-pink-500/50 shadow-[0_0_10px_rgba(219,39,119,0.2)]' : 'bg-slate-900/50'}`;
                 row.innerHTML = `<span class="font-bold truncate max-w-[280px] ${isWET ? 'text-pink-400 font-black' : 'text-slate-300'}">${item.name}</span><span class="font-mono text-slate-400">฿${Math.round(item.price).toLocaleString()}</span>`;
@@ -343,6 +345,7 @@
         function clearComparison() { comparisonState = {}; document.getElementById('comparisonResults').classList.add('hidden'); }
         function prepParserFocus(id) { setTimeout(() => { const el = document.getElementById(id); el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); }, 500); }
         function calculateDiscount() { const val = document.getElementById('otaPrice').value; document.getElementById('discountResult').innerText = val ? Math.round(val * 0.9).toLocaleString() : "--"; }
+
         function generateLinks() {
             const cin = document.getElementById('checkin').value, cout = document.getElementById('checkout').value, gst = document.getElementById('guests').value;
             if (!cin || !cout) return;
@@ -350,6 +353,7 @@
             document.getElementById('linkHW').href = `https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${cin}&to=${cout}&guests=${gst}`;
             document.getElementById('resultsArea').classList.remove('hidden');
         }
+
         function runMatrixFromSelect() {
             const dateStr = document.getElementById('fmSelector').value, gst = document.getElementById('guests').value, container = document.getElementById('matrixResults');
             if (!dateStr) return; container.innerHTML = ''; container.classList.remove('hidden');
@@ -362,10 +366,11 @@
                 const hw = `https://www.hostelworld.com/pwa/s?q=Koh%20Phangan,%20Thailand&country=Thailand&city=Koh%20Phangan&type=city&id=2017&from=${cinS}&to=${coutS}&guests=${gst}&district=232&page=1&sort=lowestprice`;
                 const row = document.createElement('div');
                 row.className = 'flex items-center gap-1 bg-slate-900 border border-slate-700 p-0.5 px-1 rounded-lg shadow-sm';
-                row.innerHTML = `<div class="w-10 font-black text-pink-500 text-xl leading-none">${p.label}</div><div class="flex-grow text-slate-400 text-base font-black font-mono text-center border-l border-slate-800">${cinS.slice(5)} to ${coutS.slice(5)}</div><div class="flex gap-1"><a href="${bcom}" target="_blank" onclick="prepParserFocus('auditArea')" class="w-14 py-1 bg-blue-600 rounded text-[10px] text-white font-black uppercase leading-none text-center">B.com</a><a href="${hw}" target="_blank" onclick="prepParserFocus('auditArea')" class="w-14 py-1 bg-orange-600 rounded text-[10px] text-white font-black uppercase leading-none text-center">HW</a></div>`;
+                row.innerHTML = `<div class="w-10 font-black text-pink-500 text-xl leading-none">${p.label}</div><div class="flex-grow text-slate-400 text-base font-black font-mono text-center border-l border-slate-800">${cinS.slice(5)} to ${coutS.slice(5)}</div><div class="flex gap-1"><a href="${bcom}" target="_blank" onclick="prepParserFocus('auditArea')" class="w-14 py-1 bg-blue-600 rounded text-[10px] text-white font-black uppercase leading-none text-center">B.com</a><a href="${hw}" target="_blank" onclick="window.auditNights = ${p.out - p.in}; prepParserFocus('auditArea')" class="w-14 py-1 bg-orange-600 rounded text-[10px] text-white font-black uppercase leading-none text-center">HW</a></div>`;
                 container.appendChild(row);
             });
         }
+
         function populateDropdown(raw) {
             const select = document.getElementById('fmSelector');
             select.innerHTML = '<option value="">-- SELECT DATE --</option>';
