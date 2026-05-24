@@ -235,7 +235,19 @@
             const text = document.getElementById('pasteArea').value;
             if (!text) return;
             const isHW = text.toLowerCase().includes("hostelworld") || text.includes("per bed") || text.includes("choose your room");
-            const cleanText = text.replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]/g, " ").replace(/\s+/g, ' ');
+            let cleanText = text.replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]/g, " ").replace(/\s+/g, ' ');
+
+            // Isolate the room table to prevent parsing prices from hidden "Search Results"
+            if (!isHW) {
+                if (cleanText.includes("Accommodation Type")) {
+                    cleanText = cleanText.substring(cleanText.indexOf("Accommodation Type"));
+                }
+                if (cleanText.includes("I'll reserve")) {
+                    cleanText = cleanText.substring(0, cleanText.indexOf("I'll reserve"));
+                } else if (cleanText.includes("Guest reviews")) {
+                    cleanText = cleanText.substring(0, cleanText.indexOf("Guest reviews"));
+                }
+            }
 
             OPERATIONAL_MAP.forEach(room => {
                 room.anchors.forEach(anchor => {
@@ -243,7 +255,16 @@
                     let match;
                     while ((match = regex.exec(cleanText)) !== null) {
                         const chunk = cleanText.substring(match.index, match.index + 1200);
-                        const prices = [...chunk.matchAll(/THB\s*([\d,.]+)/gi)].map(p => parseFloat(p[1].replace(/,/g, '')));
+                        
+                        const prices = [];
+                        const priceRegex = /(\+)?\s*(Per night\s*)?THB\s*([\d,.]+)/gi;
+                        let m;
+                        while ((m = priceRegex.exec(chunk)) !== null) {
+                            if (m[1]) continue; // Skip taxes (+)
+                            if (!isHW && m[2]) continue; // Skip 'Per night' for Booking.com
+                            prices.push(parseFloat(m[3].replace(/,/g, '')));
+                        }
+
                         if (prices.length > 0) {
                             const minValInBlock = Math.min(...prices);
                             const total = isHW ? (minValInBlock * stayNights) : minValInBlock;
@@ -282,12 +303,8 @@
             if (!rawText) return;
             container.innerHTML = ''; container.classList.remove('hidden');
 
-            let text = rawText;
-            if (text.includes("Available properties you recently viewed")) {
-                text = text.split("Available properties you recently viewed")[0];
-            } else if (text.includes("Recently viewed")) {
-                text = text.split("Recently viewed")[0];
-            }
+            // 1. FOOTER CLEANUP: Strip "Recently viewed" to prevent duplicates stealing prices
+            let text = rawText.split(/Available properties you recently viewed|Recently viewed/i)[0];
 
             const results = [];
             const isHW = text.toLowerCase().includes("hostelworld") || text.toLowerCase().includes("dorms from");
@@ -300,30 +317,45 @@
                     let name = lines[0].trim();
                     if (!isNaN(name) || name.length < 3) name = lines[1]?.trim() || "Unknown";
                     if (name.includes('Tour') || name.includes('Experience') || name.includes('Safari') || block.includes('Tickets from')) return;
-                    const prices = [...block.matchAll(/(?<!\+)\s*THB\s*([\d,.]+)/gi)].map(p => parseFloat(p[1].replace(/,/g, '')));
+                    
+                    const prices = [];
+                    const regex = /(\+)?\s*THB\s*([\d,.]+)/gi;
+                    let m;
+                    while ((m = regex.exec(block)) !== null) {
+                        if (!m[1]) prices.push(parseFloat(m[2].replace(/,/g, '')));
+                    }
+                    
                     if (name && prices.length > 0) results.push({ name, price: Math.min(...prices) * (window.auditNights || 1) });
                 });
             } else {
-                // Booking.com split logic isolates properties by the "Opens in new window" label
-                const segments = text.split("Opens in new window");
+                // BULLETPROOF SPLIT LOGIC: Splits by phrase, immune to missing newlines and old browsers
+                const segments = text.split(/\s*Opens in new window\s*/i);
                 for (let i = 0; i < segments.length - 1; i++) {
                     const nameBlock = segments[i].trim().split('\n');
                     const name = nameBlock[nameBlock.length - 1].trim();
 
-                    if (name.includes('Safari') || name.includes('Experience') || name.includes('Tour') || 
-                        name.includes('Things to do') || name.includes('Tickets') || name.length < 3) continue;
+                    // Skip ads and non-property text
+                    if (name.length < 3 || /Safari|Experience|Tour|Things to do|Tickets|reviews/i.test(name)) continue;
 
                     let dataBlock = segments[i+1];
+                    
+                    // Terminate if we hit an ad block
                     if (dataBlock.includes("Things to do in Haad Rin")) {
                         dataBlock = dataBlock.split("Things to do in Haad Rin")[0];
                     }
 
-                    const matches = [...dataBlock.matchAll(/(?<!\+)\s*THB\s*([\d,.]+)/gi)];
-                    
-                    if (name && matches.length > 0) {
-                        const prices = matches.map(p => parseFloat(p[1].replace(/,/g, '')));
-                        const cheapest = Math.min(...prices);
-                        results.push({ name, price: cheapest });
+                    // Extract all valid prices (discounted first, specifically ignoring the 'Per night' price and taxes)
+                    const prices = [];
+                    const regex = /(\+)?\s*(Per night\s*)?THB\s*([\d,.]+)/gi;
+                    let m;
+                    while ((m = regex.exec(dataBlock)) !== null) {
+                        if (!m[1] && !m[2]) {
+                            prices.push(parseFloat(m[3].replace(/,/g, '')));
+                        }
+                    }
+
+                    if (prices.length > 0) {
+                        results.push({ name, price: Math.min(...prices) });
                     }
                 }
             }
