@@ -508,6 +508,9 @@
             { id: "Dorm for Private Use", anchors: ["8-Bed Mixed Dormitory Room", "Superior 8 Bed Family"] },
             
             // SWIMS Social Beach Resort Privates
+            { id: "Standard Garden", anchors: ["SWIMS_STANDARD_GARDEN"] },
+            { id: "Superior Sea View", anchors: ["SWIMS_SUPERIOR_SEA"] },
+            { id: "Standard Triple", anchors: ["Standard Triple Room"] },
             { id: "King Balcony", anchors: ["King Room with Balcony"] },
             { id: "Twin Balcony", anchors: ["Twin Room with Balcony"] },
             { id: "King Sea View", anchors: ["King Room with Sea View"] },
@@ -611,9 +614,25 @@
         function smartParse() {
             const text = document.getElementById('pasteArea').value;
             if (!text) return;
+            
+            // 1. Wipe old data for the OTA we are currently pasting
             const isHW = text.toLowerCase().includes("hostelworld") || text.includes("per bed") || text.includes("choose your room");
             const sourceKey = isHW ? 'hw' : 'booking';
+            
+            OPERATIONAL_MAP.forEach(room => {
+                if (comparisonState[room.id]) {
+                    delete comparisonState[room.id][sourceKey];
+                    if (!comparisonState[room.id].hw && !comparisonState[room.id].booking) {
+                        delete comparisonState[room.id];
+                    }
+                }
+            });
+
             let cleanText = text.replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]/g, " ").replace(/\s+/g, ' ');
+
+            // Pre-process tricky SWIMS names to prevent substring overlaps
+            cleanText = cleanText.replace(/Superior Double or Twin Room with Sea View/gi, 'SWIMS_SUPERIOR_SEA');
+            cleanText = cleanText.replace(/Standard Double or Twin Room with Garden View/gi, 'SWIMS_STANDARD_GARDEN');
 
             // Isolate the room table to prevent parsing prices from hidden "Search Results"
             if (!isHW) {
