@@ -40,6 +40,13 @@
         input[type=number] {
             -moz-appearance: textfield;
         }
+        
+        /* Style for active custom day rates in MLOS Calculator */
+        .day-input-active {
+            background-color: #020617 !important;
+            border-color: #10b981 !important;
+            color: #34d399 !important;
+        }
     </style>
 </head>
 <body class="p-1 md:p-3">
@@ -171,7 +178,7 @@
                 </div>
             </div>
 
-            <!-- Percentage Discount Calculator -->
+            <!-- CALCULATOR 1: Percentage Discount Calculator -->
             <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-3">
                 <div class="flex justify-between items-center pb-2 border-b border-slate-700">
                     <h2 class="text-sm font-bold uppercase tracking-wider text-indigo-400">Percentage Discount Calculator</h2>
@@ -217,7 +224,6 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-700 font-mono">
-                                <!-- 1 Night Row -->
                                 <tr class="hover:bg-slate-800/40">
                                     <td class="p-2 font-bold text-white font-sans">1 Night</td>
                                     <td class="p-2 text-right text-slate-300 border-r border-slate-700/50" id="base-1">-</td>
@@ -227,7 +233,6 @@
                                     <td class="p-2 bg-emerald-950/5 text-center text-slate-500 italic text-[10px] font-sans">Locked</td>
                                     <td class="p-2 bg-emerald-950/5 text-right font-bold text-emerald-400" id="custom-1">-</td>
                                 </tr>
-                                <!-- Nights 2 to 5 loop rows -->
                                 <tr id="row-n2" class="hover:bg-slate-800/40">
                                     <td class="p-2 font-bold text-white font-sans">2 Nights</td>
                                     <td class="p-2 text-right text-slate-300 border-r border-slate-700/50" id="base-2">-</td>
@@ -270,7 +275,157 @@
                 </div>
             </div>
 
-            <!-- OTA PRICE CALCULATOR (Integrated) -->
+            <!-- DECORATIVE SEPARATOR -->
+            <div class="relative py-1 mt-4">
+                <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div class="w-full border-t border-slate-700"></div>
+                </div>
+                <div class="relative flex justify-center text-xs uppercase">
+                    <span class="bg-slate-900 px-3 text-slate-500 font-extrabold tracking-widest">OR</span>
+                </div>
+            </div>
+
+            <!-- CALCULATOR 2: Minimum Stay Pricing Calculator -->
+            <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-4 mt-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2 border-b border-slate-700 gap-2">
+                    <div>
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-400">Minimum Stay Pricing Calculator</h2>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Optimizes your nightly pricing structures down to 1 Baht intervals to hit desired totals.</p>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="override-toggle" class="sr-only peer" onchange="toggleManualMlos()">
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                            <span class="ml-2 text-xs font-semibold text-slate-300">Manual Pricing Tweak</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-2">Input Your Desired Target Package Totals (Baht):</label>
+                    <div class="grid grid-cols-5 gap-1.5 bg-slate-900 border border-slate-800 p-2 rounded-lg">
+                        <div class="text-center">
+                            <span class="block text-[9px] text-slate-500 font-bold mb-1">1 Night</span>
+                            <div class="flex items-center bg-slate-950 border border-slate-700 rounded px-1 py-0.5 w-full">
+                                <span class="text-slate-500 text-[10px] shrink-0">฿</span>
+                                <input type="number" id="mlos-t1" value="6500" step="1" class="w-full bg-transparent text-center font-bold text-white text-xs outline-none" oninput="calculateMlosModel()">
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <span class="block text-[9px] text-slate-500 font-bold mb-1">2 Nights</span>
+                            <div class="flex items-center bg-slate-950 border border-slate-700 rounded px-1 py-0.5 w-full">
+                                <span class="text-slate-500 text-[10px] shrink-0">฿</span>
+                                <input type="number" id="mlos-t2" value="7000" step="1" class="w-full bg-transparent text-center font-bold text-white text-xs outline-none" oninput="calculateMlosModel()">
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <span class="block text-[9px] text-slate-500 font-bold mb-1">3 Nights</span>
+                            <div class="flex items-center bg-slate-950 border border-slate-700 rounded px-1 py-0.5 w-full">
+                                <span class="text-slate-500 text-[10px] shrink-0">฿</span>
+                                <input type="number" id="mlos-t3" value="7500" step="1" class="w-full bg-transparent text-center font-bold text-white text-xs outline-none" oninput="calculateMlosModel()">
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <span class="block text-[9px] text-slate-500 font-bold mb-1">4 Nights</span>
+                            <div class="flex items-center bg-slate-950 border border-slate-700 rounded px-1 py-0.5 w-full">
+                                <span class="text-slate-500 text-[10px] shrink-0">฿</span>
+                                <input type="number" id="mlos-t4" value="8000" step="1" class="w-full bg-transparent text-center font-bold text-white text-xs outline-none" oninput="calculateMlosModel()">
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <span class="block text-[9px] text-slate-500 font-bold mb-1">5 Nights</span>
+                            <div class="flex items-center bg-slate-950 border border-slate-700 rounded px-1 py-0.5 w-full">
+                                <span class="text-slate-500 text-[10px] shrink-0">฿</span>
+                                <input type="number" id="mlos-t5" value="8500" step="1" class="w-full bg-transparent text-center font-bold text-white text-xs outline-none" oninput="calculateMlosModel()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="block text-[10px] sm:text-xs font-bold text-slate-400 uppercase">Interactive Nightly Pricing:</span>
+                        <span id="edit-state-badge" class="text-[9px] text-slate-500 italic">Locked to Auto-Fit</span>
+                    </div>
+                    <div class="grid grid-cols-7 gap-1 text-center">
+                        <div class="bg-slate-950 p-1 rounded border border-slate-800 flex flex-col justify-between">
+                            <span class="text-[9px] text-slate-500 font-semibold uppercase">FMP-3</span>
+                            <div class="relative mt-1">
+                                <input type="number" id="inp-fmp-3" class="w-full bg-transparent text-center font-bold text-slate-200 text-xs p-0.5 outline-none rounded transition-all" value="500" oninput="handleCalendarInput()" readonly>
+                            </div>
+                            <span class="mt-1.5 text-[8px] bg-slate-800 text-slate-400 rounded px-0.5 py-0.5 font-bold">4-Nt Min</span>
+                        </div>
+                        <div class="bg-slate-950 p-1 rounded border border-slate-800 flex flex-col justify-between">
+                            <span class="text-[9px] text-slate-500 font-semibold uppercase">FMP-2</span>
+                            <div class="relative mt-1">
+                                <input type="number" id="inp-fmp-2" class="w-full bg-transparent text-center font-bold text-slate-200 text-xs p-0.5 outline-none rounded transition-all" value="500" oninput="handleCalendarInput()" readonly>
+                            </div>
+                            <span class="mt-1.5 text-[8px] bg-slate-800 text-slate-400 rounded px-0.5 py-0.5 font-bold">3-Nt Min</span>
+                        </div>
+                        <div class="bg-slate-950 p-1 rounded border border-slate-800 flex flex-col justify-between">
+                            <span class="text-[9px] text-slate-500 font-semibold uppercase">FMP-1</span>
+                            <div class="relative mt-1">
+                                <input type="number" id="inp-fmp-1" class="w-full bg-transparent text-center font-bold text-slate-200 text-xs p-0.5 outline-none rounded transition-all" value="500" oninput="handleCalendarInput()" readonly>
+                            </div>
+                            <span class="mt-1.5 text-[8px] bg-slate-800 text-slate-400 rounded px-0.5 py-0.5 font-bold">2-Nt Min</span>
+                        </div>
+                        <div class="bg-indigo-950/40 p-1 rounded border border-indigo-500/30 flex flex-col justify-between">
+                            <span class="text-[9px] text-indigo-400 font-extrabold uppercase">FMP (Evt)</span>
+                            <div class="relative mt-1">
+                                <input type="number" id="inp-fmp" class="w-full bg-transparent text-center font-black text-amber-400 text-xs p-0.5 outline-none rounded transition-all" value="6500" oninput="handleCalendarInput()" readonly>
+                            </div>
+                            <span class="mt-1.5 text-[8px] bg-amber-500/15 text-amber-400 border border-amber-500/20 rounded px-0.5 py-0.5 font-bold">1-Nt Min</span>
+                        </div>
+                        <div class="bg-slate-950 p-1 rounded border border-slate-800 flex flex-col justify-between">
+                            <span class="text-[9px] text-slate-500 font-semibold uppercase">FMP+1</span>
+                            <div class="relative mt-1">
+                                <input type="number" id="inp-fmp-plus-1" class="w-full bg-transparent text-center font-bold text-slate-200 text-xs p-0.5 outline-none rounded transition-all" value="500" oninput="handleCalendarInput()" readonly>
+                            </div>
+                            <span class="mt-1.5 text-[8px] bg-slate-800 text-slate-400 rounded px-0.5 py-0.5 font-bold">Standard</span>
+                        </div>
+                        <div class="bg-slate-950 p-1 rounded border border-slate-800 flex flex-col justify-between">
+                            <span class="text-[9px] text-slate-500 font-semibold uppercase">FMP+2</span>
+                            <div class="relative mt-1">
+                                <input type="number" id="inp-fmp-plus-2" class="w-full bg-transparent text-center font-bold text-slate-200 text-xs p-0.5 outline-none rounded transition-all" value="500" oninput="handleCalendarInput()" readonly>
+                            </div>
+                            <span class="mt-1.5 text-[8px] bg-slate-800 text-slate-400 rounded px-0.5 py-0.5 font-bold">Standard</span>
+                        </div>
+                        <div class="bg-slate-950 p-1 rounded border border-slate-800 flex flex-col justify-between">
+                            <span class="text-[9px] text-slate-500 font-semibold uppercase">FMP+3</span>
+                            <div class="relative mt-1">
+                                <input type="number" id="inp-fmp-plus-3" class="w-full bg-transparent text-center font-bold text-slate-200 text-xs p-0.5 outline-none rounded transition-all" value="500" oninput="handleCalendarInput()" readonly>
+                            </div>
+                            <span class="mt-1.5 text-[8px] bg-slate-800 text-slate-400 rounded px-0.5 py-0.5 font-bold">Standard</span>
+                        </div>
+                    </div>
+                    <p id="helper-text-manual" class="text-[10px] text-slate-500 mt-2 hidden text-center">
+                        💡 <span class="text-emerald-400 font-medium">Manual mode active.</span> You can now click any box above and enter custom rates.
+                    </p>
+                </div>
+
+                <div class="space-y-2">
+                    <span class="block text-[10px] sm:text-xs font-bold text-slate-400 uppercase">Simulated Stay Combinations Matrix</span>
+                    <div class="border border-slate-700 rounded-lg overflow-hidden bg-slate-900/40">
+                        <div class="overflow-y-auto max-h-[350px]">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead class="sticky top-0 bg-slate-950 z-10">
+                                    <tr class="border-b border-slate-700 text-[10px] font-bold text-slate-400 uppercase">
+                                        <th class="p-2">Duration</th>
+                                        <th class="p-2">Specific Stay Path</th>
+                                        <th class="p-2 text-right">Total</th>
+                                        <th class="p-2 text-right">Target</th>
+                                        <th class="p-2 text-right">Variance</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/60 font-mono" id="combinations-tbody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md mt-4">
                 <div class="flex justify-between items-center pb-2 border-b border-slate-700 mb-2">
                     <div>
@@ -280,12 +435,10 @@
                     <div id="ota-sync-status" class="text-[10px] text-amber-500 font-bold animate-pulse">Connecting...</div>
                 </div>
 
-                <!-- Month Tabs -->
                 <div class="bg-slate-900 rounded-lg shadow-inner border border-slate-700 p-1 overflow-x-auto mb-2 flex min-w-max gap-1" id="otaMonthTabs">
                     <!-- Tabs rendered by JS -->
                 </div>
 
-                <!-- Toolbar -->
                 <div class="bg-slate-900 rounded-lg shadow-inner border border-slate-700 p-1.5 flex flex-wrap items-center justify-between gap-2 mb-2">
                     <div class="flex items-center gap-2">
                         <span class="text-[11px] font-medium text-slate-400 pl-1">Copy From:</span>
@@ -294,7 +447,6 @@
                     </div>
                 </div>
 
-                <!-- Grid Container -->
                 <div id="otaRoomsContainer" class="flex flex-col gap-2">
                     <!-- Rooms rendered by JS -->
                 </div>
@@ -302,21 +454,20 @@
 
         </div>
 
-        <footer class="mt-8 text-center text-slate-600 text-[11px] uppercase tracking-[0.2em] font-bold pb-4">
+        <footer class="mt-8 text-center text-slate-600 text-[10px] uppercase tracking-[0.2em] font-bold pb-4">
             WET Pool Party | SWIMS Social Beach Resort<br>
             <span class="text-slate-500">Wild & Wandering Group</span>
         </footer>
     </div>
 
     <script>
-        // --- Shared & State Variables ---
         const DEFAULT_DATES = `2026-01-03 | 3 Jan\n2026-02-02 | 2 Feb\n2026-03-03 | 3 Mar\n2026-04-02 | 2 Apr\n2026-05-01 | 1 May\n2026-06-01 | 1 June\n2026-06-29 | 29 Jun\n2026-07-31 | 31 Jul\n2026-08-28 | 28 Aug\n2026-09-26 | 26 Sep\n2026-10-27 | 27 Oct\n2026-11-24 | 24 Nov\n2026-12-24 | 24 Dec\n2026-12-31 | 31 Dec`;
         
         let currentProp = 'WET';
         let comparisonState = {};
         let stayNights = 1;
 
-        // --- OTA Calculator Setup ---
+        // --- OTA Setup ---
         const OTA_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const OTA_ROOMS = [
             { id: 'STD', name: 'STD', fields: [{id: 'Base', label: 'Base'}, {id: 'PlusMinus1', label: '±1 Day'}, {id: 'FMP', label: 'FMP'}] },
@@ -329,9 +480,7 @@
         
         window.otaCurrentMonth = new Date().getMonth();
         window.otaAppData = {};
-        
-        // This function will be overwritten by Firebase once it loads
-        window.saveOtaDataToCloud = function() { console.log("Cloud save not ready yet"); };
+        window.saveOtaDataToCloud = function() { console.log("Cloud not ready yet"); };
 
         const fDate = (date) => {
             const y = date.getFullYear();
@@ -364,13 +513,13 @@
             document.getElementById('checkout').value = fDate(tomorrow);
             updateStayNights();
             
-            // Local fallback init for FMP Dates
             const savedDates = localStorage.getItem('wet_fm_dates') || DEFAULT_DATES;
             document.getElementById('fmDateRaw').value = savedDates;
             populateDropdown(savedDates);
 
             // Init Pricer Tab Calcs
             calculatePercentModel();
+            calculateMlosModel();
             
             // Init OTA Tool Empty state
             for(let i=0; i<12; i++) {
@@ -381,7 +530,6 @@
             renderOtaRooms();
         };
 
-        // --- Core UI Functions ---
         function switchTab(view) {
             ['quote', 'audit', 'pricer'].forEach(v => {
                 document.getElementById('view-' + v).classList.add('hidden');
@@ -407,7 +555,6 @@
             clearComparison();
         }
 
-        // --- QUOTE TAB FUNCTIONS ---
         function handleDateChange(type) {
             const cinEl = document.getElementById('checkin'), coutEl = document.getElementById('checkout');
             const nightsEl = document.getElementById('nights');
@@ -430,14 +577,16 @@
                 nightsEl.value = nights;
             }
             updateStayNights();
-            clearComparison(); // Clear old comparison data if dates change
+            clearComparison(); 
         }
 
         function updateStayNights() {
             const cinV = document.getElementById('checkin').value, coutV = document.getElementById('checkout').value;
             if (!cinV || !coutV) return;
             const d1 = new Date(cinV), d2 = new Date(coutV);
-            stayNights = Math.floor((Date.UTC(d2.getFullYear(), d2.getMonth(), d2.getDate()) - Date.UTC(d1.getFullYear(), d1.getMonth(), d1.getDate())) / 86400000) || 1;
+            const utc1 = Date.UTC(d1.getFullYear(), d1.getMonth(), d1.getDate());
+            const utc2 = Date.UTC(d2.getFullYear(), d2.getMonth(), d2.getDate());
+            stayNights = Math.floor((utc2 - utc1) / (1000 * 60 * 60 * 24)) || 1;
             document.getElementById('nights').value = stayNights;
         }
 
@@ -461,7 +610,7 @@
             if (!text) return;
             const isHW = text.toLowerCase().includes("hostelworld") || text.includes("per bed") || text.includes("choose your room");
             
-            // Wipe OLD data for whichever source we are currently pasting so it doesn't artificially keep lower prices from a past search
+            // Wipe OLD data for whichever source we are pasting
             const sourceKey = isHW ? 'hw' : 'booking';
             Object.keys(comparisonState).forEach(roomKey => {
                 if (comparisonState[roomKey]) delete comparisonState[roomKey][sourceKey];
@@ -469,7 +618,7 @@
 
             let cleanText = text.replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]/g, " ").replace(/\s+/g, ' ');
 
-            // Tokenize SWIMS long room names to prevent overlap matching
+            // Tokenize SWIMS long room names
             cleanText = cleanText.replace(/Superior Double or Twin Room with Sea View/gi, 'SWIMS_SUP_SEA');
             cleanText = cleanText.replace(/Standard Double or Twin Room with Garden View/gi, 'SWIMS_STD_GARDEN');
             cleanText = cleanText.replace(/Standard Triple Room/gi, 'SWIMS_STD_TRIPLE');
@@ -481,6 +630,7 @@
             if (!isHW) {
                 if (cleanText.includes("Accommodation Type")) cleanText = cleanText.substring(cleanText.indexOf("Accommodation Type"));
                 if (cleanText.includes("I'll reserve")) cleanText = cleanText.substring(0, cleanText.indexOf("I'll reserve"));
+                else if (cleanText.includes("Guest reviews")) cleanText = cleanText.substring(0, cleanText.indexOf("Guest reviews"));
             }
 
             OPERATIONAL_MAP.forEach(room => {
@@ -519,7 +669,7 @@
             const sorted = Object.keys(comparisonState).sort((a,b) => (comparisonState[a].booking || comparisonState[a].hw || 9e9) - (comparisonState[b].booking || comparisonState[b].hw || 9e9));
             sorted.forEach(room => {
                 const data = comparisonState[room];
-                if (!data.booking && !data.hw) return; // Skip empty rows
+                if (!data.booking && !data.hw) return;
                 const otaMin = Math.min(...[data.booking, data.hw].filter(v => v));
                 const direct = Math.round(otaMin * 0.9);
                 const row = document.createElement('div');
@@ -533,7 +683,6 @@
         }
         function clearComparison() { comparisonState = {}; document.getElementById('comparisonResults').innerHTML = ''; }
 
-        // --- AUDIT TAB FUNCTIONS ---
         function runMatrixFromSelect() {
             const dateStr = document.getElementById('fmSelector').value, gst = document.getElementById('guests').value, container = document.getElementById('matrixResults');
             if (!dateStr) return; container.innerHTML = ''; container.classList.remove('hidden');
@@ -632,12 +781,12 @@
             localStorage.setItem('wet_fm_dates', val); 
             populateDropdown(val); 
             toggleSettings(); 
-            // Also trigger cloud save if ready
             if (window.saveDatesToCloud) window.saveDatesToCloud(val);
         }
+        function copyDatesToClipboard() { const cin = document.getElementById('checkin').value, cout = document.getElementById('checkout').value, dummy = document.createElement("textarea"); document.body.appendChild(dummy); dummy.value = `In: ${cin} | Out: ${cout}`; dummy.select(); document.execCommand("copy"); document.body.removeChild(dummy); }
 
-        // --- PRICER TAB (PERCENTAGE CALC) ---
         function formatCurrency(val) { return '฿' + Math.round(val).toLocaleString(undefined, {maximumFractionDigits: 0}); }
+        
         function calculatePercentModel() {
             const fmp = parseFloat(document.getElementById('fmpPrice').value) || 0;
             const fmw = parseFloat(document.getElementById('fmwPrice').value) || 0;
@@ -668,7 +817,87 @@
             }
         }
 
-        // --- OTA PRICE CALCULATOR LOGIC ---
+        const dayInpIds = ['inp-fmp-3', 'inp-fmp-2', 'inp-fmp-1', 'inp-fmp', 'inp-fmp-plus-1', 'inp-fmp-plus-2', 'inp-fmp-plus-3'];
+
+        function toggleManualMlos() {
+            const isManual = document.getElementById('override-toggle').checked;
+            const editBadge = document.getElementById('edit-state-badge');
+            const helperText = document.getElementById('helper-text-manual');
+
+            dayInpIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (isManual) { el.removeAttribute('readonly'); el.classList.add('day-input-active'); } 
+                else { el.setAttribute('readonly', true); el.classList.remove('day-input-active'); }
+            });
+
+            if (isManual) {
+                editBadge.innerText = "Custom Pricing Enabled"; editBadge.className = "text-[9px] text-emerald-400 font-bold"; helperText.classList.remove('hidden');
+            } else {
+                editBadge.innerText = "Locked to Auto-Fit"; editBadge.className = "text-[9px] text-slate-500 italic"; helperText.classList.add('hidden');
+                calculateMlosModel();
+            }
+        }
+
+        function handleCalendarInput() { renderCombinationsTable(); }
+
+        function calculateMlosModel() {
+            const isManual = document.getElementById('override-toggle').checked;
+
+            if (!isManual) {
+                const t1 = parseFloat(document.getElementById('mlos-t1').value) || 0;
+                const t2 = parseFloat(document.getElementById('mlos-t2').value) || 0;
+                const t3 = parseFloat(document.getElementById('mlos-t3').value) || 0;
+                const t4 = parseFloat(document.getElementById('mlos-t4').value) || 0;
+                const t5 = parseFloat(document.getElementById('mlos-t5').value) || 0;
+
+                const xVals = [0, 1, 2, 3, 4]; const yVals = [t1, t2, t3, t4, t5];
+                const totalPoints = 5; let sumX = 0; let sumY = 0; let sumXY = 0; let sumXX = 0;
+
+                for (let i = 0; i < totalPoints; i++) {
+                    sumX += xVals[i]; sumY += yVals[i]; sumXY += xVals[i] * yVals[i]; sumXX += xVals[i] * xVals[i];
+                }
+
+                let slope = (totalPoints * sumXY - sumX * sumY) / (totalPoints * sumXX - sumX * sumX);
+                let intercept = (sumY - slope * sumX) / totalPoints;
+
+                const shoulderVal = Math.max(0, Math.round(slope));
+                const fmpVal = Math.max(0, Math.round(intercept));
+
+                document.getElementById('inp-fmp').value = fmpVal;
+                document.getElementById('inp-fmp-3').value = shoulderVal; document.getElementById('inp-fmp-2').value = shoulderVal; document.getElementById('inp-fmp-1').value = shoulderVal;
+                document.getElementById('inp-fmp-plus-1').value = shoulderVal; document.getElementById('inp-fmp-plus-2').value = shoulderVal; document.getElementById('inp-fmp-plus-3').value = shoulderVal;
+            }
+            renderCombinationsTable();
+        }
+
+        function renderCombinationsTable() {
+            const p_3 = parseFloat(document.getElementById('inp-fmp-3').value) || 0; const p_2 = parseFloat(document.getElementById('inp-fmp-2').value) || 0; const p_1 = parseFloat(document.getElementById('inp-fmp-1').value) || 0;
+            const fmp = parseFloat(document.getElementById('inp-fmp').value) || 0;
+            const p_plus_1 = parseFloat(document.getElementById('inp-fmp-plus-1').value) || 0; const p_plus_2 = parseFloat(document.getElementById('inp-fmp-plus-2').value) || 0; const p_plus_3 = parseFloat(document.getElementById('inp-fmp-plus-3').value) || 0;
+            const days = [p_3, p_2, p_1, fmp, p_plus_1, p_plus_2, p_plus_3];
+            const targets = [parseFloat(document.getElementById('mlos-t1').value)||0, parseFloat(document.getElementById('mlos-t2').value)||0, parseFloat(document.getElementById('mlos-t3').value)||0, parseFloat(document.getElementById('mlos-t4').value)||0, parseFloat(document.getElementById('mlos-t5').value)||0];
+
+            const combos = [
+                { nights: 1, range: "FMP only", indices: [3] },
+                { nights: 2, range: "FMP-1 to FMP", indices: [2, 3] }, { nights: 2, range: "FMP to FMP+1", indices: [3, 4] },
+                { nights: 3, range: "FMP-2 to FMP", indices: [1, 2, 3] }, { nights: 3, range: "FMP-1 to FMP+1", indices: [2, 3, 4] }, { nights: 3, range: "FMP to FMP+2", indices: [3, 4, 5] },
+                { nights: 4, range: "FMP-3 to FMP", indices: [0, 1, 2, 3] }, { nights: 4, range: "FMP-2 to FMP+1", indices: [1, 2, 3, 4] }, { nights: 4, range: "FMP-1 to FMP+2", indices: [2, 3, 4, 5] }, { nights: 4, range: "FMP to FMP+3", indices: [3, 4, 5, 6] },
+                { nights: 5, range: "FMP-3 to FMP+1", indices: [0, 1, 2, 3, 4] }, { nights: 5, range: "FMP-2 to FMP+2", indices: [1, 2, 3, 4, 5] }, { nights: 5, range: "FMP-1 to FMP+3", indices: [2, 3, 4, 5, 6] }
+            ];
+
+            const tbody = document.getElementById('combinations-tbody'); tbody.innerHTML = '';
+            combos.forEach(c => {
+                let total = 0; c.indices.forEach(idx => { total += days[idx]; });
+                const targetPrice = targets[c.nights - 1]; const variance = total - targetPrice;
+                let varText = ''; let varClass = '';
+                if (variance === 0) { varText = 'Exact'; varClass = 'text-emerald-400 font-bold'; } else if (variance > 0) { varText = `+${Math.round(variance).toLocaleString()}`; varClass = 'text-rose-400 font-bold'; } else { varText = `-${Math.abs(Math.round(variance)).toLocaleString()}`; varClass = 'text-blue-400 font-bold'; }
+
+                const tr = document.createElement('tr'); tr.className = 'hover:bg-slate-800/40 transition-colors border-b border-slate-800/60';
+                tr.innerHTML = `<td class="p-2 font-bold text-white font-sans">${c.nights} ${c.nights === 1 ? 'Night' : 'Nights'}</td><td class="p-2 text-slate-300 font-sans">${c.range}</td><td class="p-2 text-right font-bold text-indigo-300">${formatCurrency(total)}</td><td class="p-2 text-right text-slate-500">${formatCurrency(targetPrice)}</td><td class="p-2 text-right ${varClass}">${varText}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
         function renderOtaTabs() {
             const container = document.getElementById('otaMonthTabs');
             container.innerHTML = '';
@@ -726,7 +955,7 @@
                 valEl.className = "font-mono text-[11px] font-bold text-slate-500 tracking-wide select-none w-full text-right";
             }
             
-            // Add a 500ms delay before syncing to cloud so it doesn't interrupt typing
+            // Add a 500ms delay to protect cursor focus while typing
             if (!fromCloud) {
                 clearTimeout(otaSaveTimeout);
                 otaSaveTimeout = setTimeout(() => {
@@ -755,7 +984,7 @@
             setTimeout(() => {
                 containerEl.innerHTML = originalHTML;
                 containerEl.classList.remove('bg-emerald-600', 'border-emerald-500');
-                window.handleOtaInput(roomId, fieldId, value); // Refresh val display
+                window.handleOtaInput(roomId, fieldId, value, true);
             }, 600);
         };
 
@@ -797,7 +1026,6 @@
                 container.appendChild(card);
             });
             
-            // Run calcs to populate outputs without triggering a cloud save loop
             OTA_ROOMS.forEach(room => room.fields.forEach(field => {
                 const val = window.otaAppData[window.otaCurrentMonth]?.[room.id]?.[field.id] || "";
                 window.handleOtaInput(room.id, field.id, val, true);
@@ -810,7 +1038,7 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Initialize Firebase
+        // Connecting the user's provided Firebase Credentials
         const firebaseConfig = {
             apiKey: "AIzaSyDww-DmtSsX_XL4iG1PibvoqXF1_zRp7nk",
             authDomain: "pricertool.firebaseapp.com",
@@ -840,46 +1068,47 @@
                 statusEl.textContent = "Synced to Cloud ☁️";
                 statusEl.className = "text-[10px] text-teal-400 font-bold";
                 
-                // Listen to OTA Database changes
+                // Listener for OTA Calculator Data
                 onSnapshot(doc(db, "ota_prices", uid), (docSnap) => {
                     if (docSnap.exists() && !isSyncing) {
                         isSyncing = true;
                         window.otaAppData = docSnap.data().prices || window.otaAppData;
                         
-                        // Update values gracefully without destroying input focus
                         OTA_ROOMS.forEach(room => {
                             room.fields.forEach(field => {
                                 const inputEl = document.getElementById(`ota-input-${room.id}-${field.id}`);
                                 const val = window.otaAppData[window.otaCurrentMonth]?.[room.id]?.[field.id] || "";
                                 
-                                // Only physically update the screen if you aren't currently clicked in that box
+                                // Graceful update: Only change the box if the user isn't currently typing in it
                                 if (inputEl && document.activeElement !== inputEl) {
                                     inputEl.value = val;
                                     window.handleOtaInput(room.id, field.id, val, true);
                                 }
                             });
                         });
-
                         setTimeout(() => isSyncing = false, 500);
                     }
                 });
 
-                // Listen to Matrix Dates changes
+                // Listener for Audit Matrix Dates
                 onSnapshot(doc(db, "audit_dates", uid), (docSnap) => {
                     if (docSnap.exists()) {
                         const cloudDates = docSnap.data().dates;
                         if (cloudDates && cloudDates !== document.getElementById('fmDateRaw').value) {
                             document.getElementById('fmDateRaw').value = cloudDates;
                             localStorage.setItem('wet_fm_dates', cloudDates);
-                            populateDropdown(cloudDates);
+                            
+                            // Prevent dropdown reset errors if dropdown function exists globally
+                            if (typeof window.populateDropdown === 'function') {
+                                window.populateDropdown(cloudDates);
+                            }
                         }
                     }
                 });
-
             }
         });
 
-        // Hook up the global save functions to write to Firestore
+        // Global functions exposed so the buttons can call Firestore
         window.saveOtaDataToCloud = function() {
             if (!uid || isSyncing) return;
             setDoc(doc(db, "ota_prices", uid), { prices: window.otaAppData }, { merge: true }).catch(e => console.error("Save error", e));
