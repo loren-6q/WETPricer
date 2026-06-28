@@ -553,6 +553,11 @@
                 document.getElementById('guests').value = 2; // Auto set to 2 for SWIMS
             }
             clearComparison();
+            
+            // Instantly refresh the links to the selected property if they are already visible
+            if (!document.getElementById('resultsArea').classList.contains('hidden')) {
+                generateLinks();
+            }
         }
 
         function handleDateChange(type) {
@@ -595,10 +600,13 @@
             if (!cin || !cout) return;
             
             const bcomWet = `https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${cin}&checkout=${cout}&group_adults=${gst}&group_children=0&no_rooms=1`;
-            const bcomSwims = `https://www.booking.com/hotel/th/swims-a-social-beach-resort.en-gb.html?checkin=${cin}&checkout=${cout}&group_adults=${gst}&group_children=0&no_rooms=1`;
+            const bcomSwims = `https://www.booking.com/hotel/th/swims-a-social-beach-resort.html?checkin=${cin}&checkout=${cout}&group_adults=${gst}&group_children=0&no_rooms=1`;
             
+            const hwWet = `https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${cin}&to=${cout}&guests=${gst}`;
+            const hwSwims = `https://www.hostelworld.com/pwa/hosteldetails.php/SWIMS-a-Social-Beach-Resort/Koh-Phangan/339615?from=${cin}&to=${cout}&guests=${gst}`;
+
             document.getElementById('linkBooking').href = currentProp === 'WET' ? bcomWet : bcomSwims;
-            document.getElementById('linkHW').href = `https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${cin}&to=${cout}&guests=${gst}`;
+            document.getElementById('linkHW').href = currentProp === 'WET' ? hwWet : hwSwims;
             document.getElementById('resultsArea').classList.remove('hidden');
         }
 
@@ -1119,5 +1127,6 @@
             setDoc(doc(db, "audit_dates", uid), { dates: datesString }, { merge: true }).catch(e => console.error("Save error", e));
         };
     </script>
+    <script src="https://loren-6q.github.io/WETNav/nav.js"></script>
 </body>
 </html>
