@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pricing & Audit Tool</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏷️</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
         body {
@@ -17,20 +18,16 @@
         .glass-card {
             background: rgba(30, 41, 59, 0.4);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
         }
         input[type="date"], select, textarea, input[type="number"] {
             color-scheme: dark;
         }
-        .header-main { font-size: 30px; line-height: 1; }
-        .search-input { font-size: 24px !important; }
+        .search-input { font-size: 20px !important; }
         .label-text { font-size: 16px; }
-        .parser-textarea { font-size: 10px !important; line-height: 1.1; }
+        .parser-textarea { font-size: 10px !important; line-height: 1.2; }
         ::-webkit-scrollbar { width: 4px; height: 8px; }
         ::-webkit-scrollbar-thumb { background: #db2777; border-radius: 10px; }
-        .tab-active { border-bottom: 4px solid #db2777; color: #f8fafc; }
-        .tab-inactive { color: #64748b; }
-
+        
         /* Hide number input arrows */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
@@ -39,7 +36,6 @@
         }
         input[type=number] { -moz-appearance: textfield; }
 
-        /* Style for active custom day rates (Pricer Tab) */
         .day-input-active {
             background-color: #020617 !important;
             border-color: #10b981 !important;
@@ -50,28 +46,28 @@
 <body class="p-1 md:p-3">
 
     <div class="max-w-xl mx-auto pb-12">
-        <header class="mb-4 text-center">
-            <h1 class="header-main font-black text-pink-500 uppercase tracking-tighter">Pricing & Audit Tool</h1>
-            <p class="text-[11px] text-slate-500 uppercase tracking-[0.3em] font-bold">Revenue Management</p>
+        <header class="flex justify-between items-center mb-3 px-1 border-b border-slate-800 pb-2">
+            <div class="flex items-center gap-1">
+                <span class="text-xl">💰</span>
+                <h1 class="text-lg font-black text-white uppercase tracking-tighter leading-none mt-1">Pricing Tool</h1>
+            </div>
+            
+            <div class="flex bg-slate-900 border border-slate-700 rounded-lg p-0.5 gap-0.5">
+                <button onclick="switchTab('quote')" id="tab-quote" class="px-2 py-1 text-[10px] font-bold uppercase rounded bg-pink-600 text-white shadow transition-all flex items-center gap-1"><span class="text-xs">🛎️</span> Quote</button>
+                <button onclick="switchTab('audit')" id="tab-audit" class="px-2 py-1 text-[10px] font-bold uppercase rounded text-slate-500 hover:text-white transition-all flex items-center gap-1"><span class="text-xs">📊</span> Audit</button>
+                <button onclick="switchTab('pricer')" id="tab-pricer" class="px-2 py-1 text-[10px] font-bold uppercase rounded text-slate-500 hover:text-white transition-all flex items-center gap-1"><span class="text-xs">🏷️</span> Pricer</button>
+            </div>
         </header>
-
-        <!-- TABS -->
-        <div class="flex border-b border-slate-800 mb-4 px-2">
-            <button onclick="switchTab('quote')" id="tab-quote" class="flex-1 py-3 font-black text-sm uppercase tracking-widest tab-active">Quote</button>
-            <button onclick="switchTab('audit')" id="tab-audit" class="flex-1 py-3 font-black text-sm uppercase tracking-widest tab-inactive">Audit</button>
-            <button onclick="switchTab('pricer')" id="tab-pricer" class="flex-1 py-3 font-black text-sm uppercase tracking-widest tab-inactive">Pricer</button>
-        </div>
 
         <!-- TAB 1: QUOTE SECTION -->
         <div id="view-quote" class="block space-y-3">
             
-            <!-- Property Toggle -->
             <div class="flex bg-slate-900 border border-slate-700 rounded-lg p-1 gap-1 mb-2">
                 <button id="prop-wet" onclick="toggleProperty('WET')" class="flex-1 py-1.5 text-xs font-black uppercase rounded bg-pink-600 text-white shadow transition-all">WET Pool Party</button>
                 <button id="prop-swims" onclick="toggleProperty('SWIMS')" class="flex-1 py-1.5 text-xs font-black uppercase rounded text-slate-400 hover:text-white transition-all">SWIMS Beach Resort</button>
             </div>
 
-            <div class="glass-card rounded-xl p-2">
+            <div class="glass-card rounded-xl border border-slate-700 p-2">
                 <div class="grid grid-cols-12 gap-2 items-end">
                     <div class="col-span-4">
                         <label class="block label-text font-black mb-0 text-slate-400 uppercase tracking-tighter">In</label>
@@ -90,96 +86,82 @@
                         <input type="number" id="guests" value="1" min="1" max="99" onchange="clearComparison()" class="search-input w-full bg-slate-900 border border-slate-700 rounded-lg px-1 py-0 text-white outline-none focus:border-pink-500 text-center leading-none">
                     </div>
                 </div>
-                <button onclick="generateLinks()" class="w-full mt-2 bg-pink-600 hover:bg-pink-500 text-white font-black py-0.5 rounded-lg transition-all text-xl uppercase tracking-widest shadow-lg active:scale-95">Run Search</button>
+                <button onclick="generateLinks()" class="w-full mt-2 bg-pink-600 hover:bg-pink-500 text-white font-black py-1 rounded-lg transition-all text-sm uppercase tracking-widest shadow-lg active:scale-95">Run Search</button>
             </div>
 
             <div id="resultsArea" class="hidden">
                 <div class="grid grid-cols-3 gap-1.5">
-                    <a id="linkBooking" target="_blank" onclick="prepParserFocus('pasteArea')" class="glass-card py-0.5 px-1 rounded-xl border border-slate-700 flex flex-col items-center justify-center hover:bg-slate-800 transition">
+                    <a id="linkBooking" target="_blank" onclick="prepParserFocus('pasteArea')" class="glass-card py-1 px-1 rounded-xl border border-slate-700 flex flex-col items-center justify-center hover:bg-slate-800 transition">
                         <span class="label-text font-black text-blue-400 uppercase text-center leading-none">Booking.com</span>
-                        <span class="text-[11px] font-bold text-slate-400 uppercase leading-none">Open</span>
                     </a>
-                    <a id="linkHW" target="_blank" onclick="prepParserFocus('pasteArea')" class="glass-card py-0.5 px-1 rounded-xl border border-slate-700 flex flex-col items-center justify-center hover:bg-slate-800 transition">
+                    <a id="linkHW" target="_blank" onclick="prepParserFocus('pasteArea')" class="glass-card py-1 px-1 rounded-xl border border-slate-700 flex flex-col items-center justify-center hover:bg-slate-800 transition">
                         <span class="label-text font-black text-orange-400 uppercase text-center leading-none">Hostelworld</span>
-                        <span class="text-[11px] font-bold text-slate-400 uppercase leading-none">Open</span>
                     </a>
-                    <div class="glass-card py-0.5 px-1 rounded-xl border border-slate-700 flex flex-col items-center justify-center relative overflow-hidden">
-                        <span class="label-text font-black text-green-400 uppercase text-center leading-none tracking-tighter">Direct</span>
-                        <a href="https://inbox.myallocator.com/booknow/-sxO1cCV5jLMwqZTXY629A" target="_blank" class="text-[11px] font-bold text-slate-400 underline decoration-green-500/50 uppercase leading-none">Open Engine</a>
-                        <button onclick="copyDatesToClipboard()" class="absolute bottom-0 right-0 bg-slate-700 p-0.5 rounded-tl-md text-[10px]">📋</button>
+                    <div class="glass-card py-1 px-1 rounded-xl border border-slate-700 flex flex-col items-center justify-center relative overflow-hidden">
+                        <span class="label-text font-black text-green-400 uppercase text-center leading-none tracking-tighter mb-1">Direct</span>
+                        <a href="https://inbox.myallocator.com/booknow/-sxO1cCV5jLMwqZTXY629A" target="_blank" class="text-[9px] font-bold text-slate-400 underline decoration-green-500/50 uppercase leading-none">Open Engine</a>
                     </div>
                 </div>
             </div>
 
-            <div class="glass-card rounded-xl border border-blue-500/30 overflow-hidden">
-                <div class="px-3 py-1 bg-blue-900/20 border-b border-blue-500/30 flex justify-between items-center">
-                    <h3 class="label-text font-black text-blue-400 uppercase tracking-widest">Pricing Parser</h3>
-                    <button onclick="clearComparison()" class="text-[10px] text-slate-500 uppercase hover:text-white font-bold">Reset</button>
+            <div class="glass-card rounded-xl border border-blue-500/30 overflow-hidden p-2 space-y-2">
+                <textarea id="pasteArea" rows="2" placeholder="Paste listing text here (B.com or HW)..." class="parser-textarea w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-400 outline-none focus:border-blue-500 transition"></textarea>
+                <div class="flex gap-2">
+                    <button onclick="smartParse()" class="flex-grow bg-blue-600 hover:bg-blue-500 text-white font-black py-1.5 rounded-lg text-sm uppercase tracking-widest transition shadow-lg">Compare</button>
+                    <button onclick="clearComparison()" class="w-16 bg-slate-700 hover:bg-slate-600 text-white font-black py-1.5 rounded-lg text-[10px] uppercase transition shadow">Clear</button>
                 </div>
-                <div class="p-2">
-                    <textarea id="pasteArea" rows="1" placeholder="Paste listing text here (B.com or HW)..." class="parser-textarea w-full bg-slate-900 border border-slate-700 rounded-lg p-1 text-slate-400 outline-none focus:border-blue-500 transition mb-1.5 h-10"></textarea>
-                    <button onclick="smartParse()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-0.5 rounded-lg text-lg uppercase tracking-widest transition shadow-lg">Merge & Compare</button>
-                    <div id="comparisonResults" class="hidden mt-2 space-y-1"></div>
-                </div>
-            </div>
-
-            <div class="glass-card rounded-xl border border-green-500/30 p-2 px-3">
-                 <div class="flex items-center gap-4">
-                    <div class="w-1/2">
-                        <label class="block label-text font-black mb-0 text-slate-400 uppercase tracking-tight">Discounter</label>
-                        <input type="number" id="otaPrice" placeholder="Price" oninput="calculateDiscount()" class="search-input w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-0.5 font-black text-white outline-none leading-none">
-                    </div>
-                    <div class="w-1/2 text-right border-l border-slate-700 pl-4">
-                        <div class="label-text font-black text-green-500 uppercase mb-0 tracking-tighter text-base">Direct Quote (-10%)</div>
-                        <div class="text-[36px] font-black text-white leading-none" id="discountResult">--</div>
-                    </div>
-                </div>
+                <div id="comparisonResults" class="hidden mt-2 space-y-1"></div>
             </div>
         </div>
 
         <!-- TAB 2: AUDIT & MATRIX SECTION -->
-        <div id="view-audit" class="hidden space-y-4">
-            <div class="glass-card rounded-xl border border-pink-500/20 overflow-hidden">
-                <div class="px-3 py-1 bg-pink-900/20 border-b border-pink-500/30 flex justify-between items-center">
-                    <h3 class="label-text font-black text-pink-400 uppercase tracking-widest">FMP Audit Matrix</h3>
-                    <button onclick="toggleSettings()" class="text-xs text-slate-500 hover:text-white uppercase font-bold">Edit Dates</button>
-                </div>
-                <div id="matrixMain" class="p-2 text-center">
-                    <div class="flex gap-2 mb-1 justify-center">
-                        <select id="fmSelector" onchange="runMatrixFromSelect()" class="flex-grow bg-slate-900 border border-slate-700 rounded-lg p-0.5 text-base sm:text-lg text-white outline-none focus:border-pink-500 cursor-pointer font-black appearance-none text-center">
-                            <option value="">-- SELECT DATE --</option>
+        <div id="view-audit" class="hidden space-y-2">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <!-- Col 1: Settings -->
+                <div class="glass-card rounded-xl border border-slate-700 p-2 flex flex-col gap-2">
+                    <div class="flex justify-between items-center px-1">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Matrix Config</span>
+                        <button onclick="toggleSettings()" class="text-[10px] bg-slate-700 px-2 py-0.5 rounded text-slate-300 hover:text-white uppercase font-bold transition">Edit Dates</button>
+                    </div>
+                    
+                    <div id="matrixSettings" class="hidden flex-col gap-1 bg-slate-900 border border-slate-700 rounded p-1 mb-1">
+                        <textarea id="fmDateRaw" rows="4" class="parser-textarea w-full bg-slate-800 border border-slate-700 rounded p-1 text-slate-400"></textarea>
+                        <button id="saveDatesBtn" onclick="saveDates()" class="w-full bg-green-700 text-white text-[10px] py-1 rounded font-black hover:bg-green-600 transition uppercase shadow">Save DB</button>
+                    </div>
+
+                    <div class="flex gap-1">
+                        <select id="fmSelector" onchange="runMatrixFromSelect()" class="flex-grow bg-slate-900 border border-slate-700 rounded p-1 text-sm text-white outline-none focus:border-pink-500 cursor-pointer font-black appearance-none text-center truncate">
+                            <option value="">-- MONTH --</option>
                         </select>
-                        <select id="auditGuests" onchange="runMatrixFromSelect()" class="w-32 shrink-0 bg-slate-900 border border-slate-700 rounded-lg p-0.5 text-base sm:text-lg text-white outline-none focus:border-pink-500 cursor-pointer font-black appearance-none text-center">
+                        <select id="auditGuests" onchange="runMatrixFromSelect()" class="w-24 shrink-0 bg-slate-900 border border-slate-700 rounded p-1 text-sm text-white outline-none focus:border-pink-500 cursor-pointer font-black appearance-none text-center">
                             <option value="1">1 GUEST</option>
                             <option value="2">2 GUESTS</option>
                             <option value="3">3 GUESTS</option>
                         </select>
                     </div>
-                    <div id="matrixResults" class="hidden space-y-1"></div>
                 </div>
-                <div id="matrixSettings" class="hidden p-2 bg-slate-900 border-t border-slate-700">
-                    <textarea id="fmDateRaw" rows="4" class="parser-textarea w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-500 mb-2"></textarea>
-                    <button onclick="saveDates()" class="w-full bg-slate-700 text-xs py-0.5 rounded-lg font-black hover:bg-green-700 transition uppercase">Save DB</button>
+
+                <!-- Col 2: Matrix Grid -->
+                <div class="glass-card rounded-xl border border-slate-700 p-2">
+                    <div id="matrixResults" class="space-y-1">
+                        <div class="text-[10px] text-center text-slate-500 italic mt-6">Select a month to load matrix</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="glass-card rounded-xl border border-orange-500/30 overflow-hidden">
-                <div class="px-3 py-1 bg-orange-900/20 border-b border-orange-500/30 flex justify-between items-center">
-                    <h3 class="label-text font-black text-orange-400 uppercase tracking-widest">Competitive Audit Parser</h3>
-                    <button onclick="document.getElementById('auditArea').value=''; document.getElementById('auditResults').classList.add('hidden'); document.getElementById('auditFilters').classList.add('hidden');" class="text-[10px] text-slate-500 uppercase hover:text-white font-bold">Clear</button>
+            <!-- ROW 3 & 4: Text Box & Buttons -->
+            <div class="glass-card rounded-xl border border-orange-500/30 p-2 space-y-2 mt-2">
+                <textarea id="auditArea" rows="2" placeholder="Paste Booking.com/HW text here..." class="parser-textarea w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-400 outline-none focus:border-orange-500 transition h-12"></textarea>
+                
+                <div class="flex gap-2">
+                    <button onclick="auditParse()" class="flex-grow bg-orange-600 hover:bg-orange-500 text-white font-black py-1.5 rounded-lg text-sm uppercase tracking-widest transition shadow-lg">Parse</button>
+                    <button onclick="clearAudit()" class="w-16 shrink-0 bg-slate-700 hover:bg-slate-600 text-white font-black py-1.5 rounded-lg text-[10px] uppercase transition shadow">Clear</button>
+                    <button id="btn-filt-cycle" onclick="cycleAuditFilter()" class="w-20 shrink-0 bg-blue-600 hover:bg-blue-500 text-white font-black py-1.5 rounded-lg text-[10px] uppercase transition shadow hidden">ALL</button>
                 </div>
-                <div class="p-2">
-                    <textarea id="auditArea" rows="1" placeholder="Paste Search Results text here..." class="parser-textarea w-full bg-slate-900 border border-slate-700 rounded-lg p-1 text-slate-400 outline-none focus:border-orange-500 transition mb-1.5 h-10"></textarea>
-                    <button onclick="auditParse()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-0.5 rounded-lg text-lg uppercase tracking-widest transition shadow-lg">Analyze Market</button>
-                    
-                    <div id="auditFilters" class="hidden flex gap-1 mt-2">
-                        <button onclick="filterAudit('all')" id="btn-filt-all" class="flex-1 text-[10px] py-1 rounded bg-orange-600 text-white font-black uppercase shadow transition-colors">All</button>
-                        <button onclick="filterAudit('dorm')" id="btn-filt-dorm" class="flex-1 text-[10px] py-1 rounded bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700 font-black uppercase transition-colors">Dorms</button>
-                        <button onclick="filterAudit('private')" id="btn-filt-private" class="flex-1 text-[10px] py-1 rounded bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700 font-black uppercase transition-colors">Privates</button>
-                    </div>
 
-                    <div id="auditResults" class="hidden mt-2 space-y-1 max-h-[650px] overflow-y-auto pr-1"></div>
-                </div>
+                <!-- ROW 5: Results -->
+                <div id="auditResults" class="hidden mt-2 space-y-1 max-h-[600px] overflow-y-auto pr-1"></div>
             </div>
         </div>
 
@@ -231,18 +213,14 @@
                                 </tr>
                             </thead>
                             <tbody id="percent-tbody" class="divide-y divide-slate-700 font-mono">
-                                <!-- Dynamic Percent Rows -->
+                                <!-- Dynamic Percent Rows generated in JS -->
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <div class="relative py-1">
-                <div class="absolute inset-0 flex items-center" aria-hidden="true"><div class="w-full border-t border-slate-700"></div></div>
-                <div class="relative flex justify-center text-xs uppercase"><span class="bg-slate-900 px-3 text-slate-500 font-extrabold tracking-widest">OR</span></div>
-            </div>
-
+            <!-- Minimum Stay Section -->
             <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-4">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2 border-b border-slate-700 gap-2">
                     <div>
@@ -258,9 +236,7 @@
 
                 <div>
                     <label class="block text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-2">Target Package Totals (Baht):</label>
-                    <div class="grid grid-cols-5 gap-1.5 bg-slate-900 border border-slate-800 p-2 rounded-lg" id="targets-container">
-                        <!-- Dynamic Targets generated by JS -->
-                    </div>
+                    <div class="grid grid-cols-5 gap-1.5 bg-slate-900 border border-slate-800 p-2 rounded-lg" id="targets-container"></div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-lg p-3">
@@ -268,9 +244,7 @@
                         <span class="block text-[10px] font-bold text-slate-400 uppercase">Interactive Nightly Pricing:</span>
                         <span id="edit-state-badge" class="text-[9px] text-slate-500 italic">Locked to Auto-Fit</span>
                     </div>
-                    <div class="grid grid-cols-7 gap-1 text-center" id="calendar-container">
-                        <!-- Dynamic Calendar Strip generated by JS -->
-                    </div>
+                    <div class="grid grid-cols-7 gap-1 text-center" id="calendar-container"></div>
                     <p id="helper-text-manual" class="text-[10px] text-slate-500 mt-2 hidden text-center">💡 <span class="text-emerald-400 font-medium">Manual mode active.</span> Enter custom rates above.</p>
                 </div>
 
@@ -305,12 +279,13 @@
                 </div>
 
                 <div class="bg-slate-900 rounded-lg border border-slate-700 p-1 flex overflow-x-auto gap-1" id="monthTabs"></div>
-                <div id="roomsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2"></div>
+                <div id="roomsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2"></div>
             </div>
         </div>
 
-        <footer class="mt-8 text-center text-slate-600 text-[11px] uppercase tracking-[0.2em] font-bold pb-4">
-            WET Pool Party | SWIMS Social Beach Resort | Wild & Wandering Group
+        <footer class="mt-8 text-center text-slate-600 text-[10px] uppercase tracking-widest font-bold pb-4 flex flex-col gap-1">
+            <span>WET Pool Party | SWIMS Social Beach Resort</span>
+            <span>LOUD! Boutique Party Hostel | Wild & Wandering Group</span>
         </footer>
     </div>
 
@@ -319,7 +294,6 @@
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        // FIREBASE SETUP
         const firebaseConfig = {
             apiKey: "AIzaSyDww-DmtSsX_XL4iG1PibvoqXF1_zRp7nk",
             authDomain: "pricertool.firebaseapp.com",
@@ -331,18 +305,18 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        
         let uid = null;
         let saveTimeout = null;
 
-        // GLOBAL APP DATA
         window.currentProp = 'WET';
         window.comparisonState = {};
         window.stayNights = 1;
-        
         window.otaCurrentMonth = new Date().getMonth();
         window.otaAppData = {};
+        window.auditFilterState = 0; // 0=All, 1=Dorm, 2=Private
         
-        const DEFAULT_DATES = `2026-01-03 | 3 Jan 2026\n2026-02-02 | 2 Feb 2026\n2026-03-03 | 3 Mar 2026\n2026-04-02 | 2 Apr 2026\n2026-05-01 | 1 May 2026\n2026-06-01 | 1 Jun 2026\n2026-06-29 | 29 Jun 2026\n2026-07-31 | 31 Jul 2026\n2026-08-28 | 28 Aug 2026\n2026-09-26 | 26 Sep 2026\n2026-10-27 | 27 Oct 2026\n2026-11-24 | 24 Nov 2026\n2026-12-24 | 24 Dec 2026\n2026-12-31 | 31 Dec 2026\n2027-01-22 | 22 Jan 2027\n2027-02-22 | 22 Feb 2027\n2027-03-22 | 22 Mar 2027\n2027-04-21 | 21 Apr 2027\n2027-05-21 | 21 May 2027\n2027-06-19 | 19 Jun 2027\n2027-07-20 | 20 Jul 2027\n2027-08-17 | 17 Aug 2027\n2027-09-15 | 15 Sep 2027\n2027-10-16 | 16 Oct 2027\n2027-11-13 | 13 Nov 2027\n2027-12-13 | 13 Dec 2027\n2027-12-31 | 31 Dec 2027`;
+        const DEFAULT_DATES = `2026-09-26 | 26 Sep 2026\n2026-10-27 | 27 Oct 2026\n2026-11-24 | 24 Nov 2026\n2026-12-24 | 24 Dec 2026\n2026-12-31 | 31 Dec 2026\n2027-01-22 | 22 Jan 2027\n2027-02-22 | 22 Feb 2027\n2027-03-22 | 22 Mar 2027\n2027-04-21 | 21 Apr 2027\n2027-05-21 | 21 May 2027\n2027-06-19 | 19 Jun 2027\n2027-07-20 | 20 Jul 2027\n2027-08-17 | 17 Aug 2027\n2027-09-15 | 15 Sep 2027\n2027-10-16 | 16 Oct 2027\n2027-11-13 | 13 Nov 2027\n2027-12-13 | 13 Dec 2027\n2027-12-31 | 31 Dec 2027`;
         
         const OPERATIONAL_MAP = [
             { id: "WET Female Dorm", anchors: ["Single Bed in Female Dormitory", "Standard 8 Bed Female"] },
@@ -370,17 +344,16 @@
             { id: 'TPL_FMP', name: 'TPL FMP', fields: [{id: 'Base', label: 'Base'}, {id: 'FMP', label: 'FMP'}] }
         ];
 
-        // STARTUP INIT
         signInAnonymously(auth).then((userCred) => {
             uid = userCred.user.uid;
-            onSnapshot(doc(db, "audit_dates", uid), (doc) => {
-                const dates = doc.exists() ? doc.data().dates : DEFAULT_DATES;
+            onSnapshot(doc(db, "audit_dates", uid), (docSnap) => {
+                const dates = docSnap.exists() ? docSnap.data().dates : DEFAULT_DATES;
                 document.getElementById('fmDateRaw').value = dates;
                 populateDropdown(dates);
             });
-            onSnapshot(doc(db, "ota_prices", uid), (doc) => {
-                if (doc.exists() && doc.data().data) {
-                    window.otaAppData = JSON.parse(doc.data().data);
+            onSnapshot(doc(db, "ota_prices", uid), (docSnap) => {
+                if (docSnap.exists() && docSnap.data().data) {
+                    window.otaAppData = JSON.parse(docSnap.data().data);
                     softUpdateOtaValues(); 
                 } else {
                     initializeEmptyOtaData();
@@ -410,14 +383,21 @@
         };
         const formatCurrency = (val) => '฿' + Math.round(val).toLocaleString(undefined, {maximumFractionDigits: 0});
 
-        // CORE UI LOGIC
         window.switchTab = (view) => {
             ['quote', 'audit', 'pricer'].forEach(v => {
                 document.getElementById('view-' + v).classList.add('hidden');
-                document.getElementById('tab-' + v).classList.replace('tab-active', 'tab-inactive');
+                const tab = document.getElementById('tab-' + v);
+                tab.classList.remove('bg-pink-600', 'bg-blue-600', 'bg-emerald-600', 'text-white', 'shadow');
+                tab.classList.add('text-slate-500');
             });
             document.getElementById('view-' + view).classList.remove('hidden');
-            document.getElementById('tab-' + view).classList.replace('tab-inactive', 'tab-active');
+            const activeTab = document.getElementById('tab-' + view);
+            activeTab.classList.remove('text-slate-500');
+            
+            // Apply specific colors per tab
+            if(view === 'quote') activeTab.classList.add('bg-pink-600', 'text-white', 'shadow');
+            if(view === 'audit') activeTab.classList.add('bg-blue-600', 'text-white', 'shadow');
+            if(view === 'pricer') activeTab.classList.add('bg-emerald-600', 'text-white', 'shadow');
         };
 
         window.toggleProperty = (prop) => {
@@ -426,7 +406,6 @@
             if (prop === 'WET') {
                 wetBtn.className = "flex-1 py-1.5 text-xs font-black uppercase rounded bg-pink-600 text-white shadow transition-all";
                 swimsBtn.className = "flex-1 py-1.5 text-xs font-black uppercase rounded text-slate-400 hover:text-white transition-all";
-                document.getElementById('guests').value = 1; 
             } else {
                 wetBtn.className = "flex-1 py-1.5 text-xs font-black uppercase rounded text-slate-400 hover:text-white transition-all";
                 swimsBtn.className = "flex-1 py-1.5 text-xs font-black uppercase rounded bg-cyan-600 text-white shadow transition-all";
@@ -436,7 +415,6 @@
             if (!document.getElementById('resultsArea').classList.contains('hidden')) generateLinks();
         };
 
-        // QUOTE LOGIC
         window.handleDateChange = (type) => {
             const cinEl = document.getElementById('checkin'), coutEl = document.getElementById('checkout'), nightsEl = document.getElementById('nights');
             let cin = new Date(cinEl.value), cout = new Date(coutEl.value), nights = parseInt(nightsEl.value) || 1;
@@ -471,8 +449,8 @@
             const hwWet = `https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${cin}&to=${cout}&guests=${gst}`;
             const hwSwims = `https://www.hostelworld.com/pwa/hosteldetails.php/SWIMS-a-Social-Beach-Resort/Koh-Phangan/339615?from=${cin}&to=${cout}&guests=${gst}`;
 
-            document.getElementById('linkBooking').href = currentProp === 'WET' ? bcomWet : bcomSwims;
-            document.getElementById('linkHW').href = currentProp === 'WET' ? hwWet : hwSwims;
+            document.getElementById('linkBooking').href = window.currentProp === 'WET' ? bcomWet : bcomSwims;
+            document.getElementById('linkHW').href = window.currentProp === 'WET' ? hwWet : hwSwims;
             document.getElementById('resultsArea').classList.remove('hidden');
         };
 
@@ -482,10 +460,8 @@
             const isHW = text.toLowerCase().includes("hostelworld") || text.includes("per bed") || text.includes("choose your room");
             let cleanText = text.replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]/g, " ").replace(/\s+/g, ' ');
 
-            // Wipe specific OTA data so it doesn't stick
-            Object.keys(comparisonState).forEach(room => { if (comparisonState[room]) delete comparisonState[room][isHW ? 'hw' : 'booking']; });
+            Object.keys(window.comparisonState).forEach(room => { if (window.comparisonState[room]) delete window.comparisonState[room][isHW ? 'hw' : 'booking']; });
 
-            // Tokenize SWIMS specific tricky names to avoid substring matches
             cleanText = cleanText.replace(/Superior Double or Twin Room with Sea View/gi, "SWIMS_SUP_SEA");
             cleanText = cleanText.replace(/Standard Double or Twin Room with Garden View/gi, "SWIMS_STD_GARDEN");
             cleanText = cleanText.replace(/Twin Room with Sea View/gi, "SWIMS_TWIN_SEA");
@@ -529,13 +505,13 @@
         function renderComparison() {
             const container = document.getElementById('comparisonResults');
             container.innerHTML = ''; container.classList.remove('hidden');
-            const sorted = Object.keys(comparisonState).sort((a,b) => (comparisonState[a].booking || comparisonState[a].hw || 9e9) - (comparisonState[b].booking || comparisonState[b].hw || 9e9));
+            const sorted = Object.keys(window.comparisonState).sort((a,b) => (window.comparisonState[a].booking || window.comparisonState[a].hw || 9e9) - (window.comparisonState[b].booking || window.comparisonState[b].hw || 9e9));
             sorted.forEach(room => {
-                const data = comparisonState[room], otaMin = Math.min(...[data.booking, data.hw].filter(v => v));
+                const data = window.comparisonState[room], otaMin = Math.min(...[data.booking, data.hw].filter(v => v));
                 const direct = Math.round(otaMin * 0.9);
                 const row = document.createElement('div');
                 row.className = 'flex items-center bg-slate-900 border border-slate-700 p-1.5 rounded-lg gap-1 mb-1 shadow-inner';
-                const nameParts = room.split(' '); nameParts.shift(); // Remove WET/SWIMS prefix visually
+                const nameParts = room.split(' '); nameParts.shift(); 
                 row.innerHTML = `<div class="w-[34%] font-black text-[15px] text-slate-200 truncate uppercase tracking-tighter leading-none" title="${room}">${nameParts.join(' ')}</div>
                     <div class="flex-1 flex flex-col items-center border-l border-slate-800"><span class="text-[8px] text-blue-400 font-black uppercase">B.COM</span><span class="text-sm text-slate-400">${data.booking ? '฿'+data.booking.toLocaleString() : '-'}</span></div>
                     <div class="flex-1 flex flex-col items-center border-l border-slate-800"><span class="text-[8px] text-orange-400 font-black uppercase">HW</span><span class="text-sm text-slate-400">${data.hw ? '฿'+data.hw.toLocaleString() : '-'}</span></div>
@@ -545,14 +521,95 @@
         }
 
         window.clearComparison = () => { window.comparisonState = {}; document.getElementById('comparisonResults').classList.add('hidden'); };
-        window.calculateDiscount = () => { const val = document.getElementById('otaPrice').value; document.getElementById('discountResult').innerText = val ? Math.round(val * 0.9).toLocaleString() : "--"; };
         window.prepParserFocus = (id) => { setTimeout(() => { const el = document.getElementById(id); el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); }, 500); };
 
-        // AUDIT LOGIC
+        window.toggleSettings = () => {
+            const el = document.getElementById('matrixSettings');
+            el.classList.toggle('hidden');
+            el.classList.toggle('flex');
+        };
+
+        window.runMatrixFromSelect = () => {
+            const dateStr = document.getElementById('fmSelector').value, gst = document.getElementById('auditGuests').value, container = document.getElementById('matrixResults');
+            if (!dateStr) { 
+                container.innerHTML = '<div class="text-[10px] text-center text-slate-500 italic mt-6">Select a month to load matrix</div>'; 
+                return; 
+            }
+            container.innerHTML = ''; 
+            const partyDate = new Date(dateStr);
+            
+            function shortD(d1, d2) {
+                const m1 = d1.getMonth()+1, day1 = d1.getDate(), m2 = d2.getMonth()+1, day2 = d2.getDate();
+                return m1 === m2 ? `${m1}/${day1}-${day2}` : `${m1}/${day1}-${m2}/${day2}`;
+            }
+
+            [{label:"1 Nt", in:0, out:1}, {label:"2 Nt", in:-1, out:1}, {label:"3 Nt", in:-1, out:2}, {label:"4 Nt", in:-2, out:2}, {label:"5 Nt", in:-2, out:3}].forEach(p => {
+                const cin = new Date(partyDate); cin.setDate(partyDate.getDate() + p.in);
+                const cout = new Date(partyDate); cout.setDate(partyDate.getDate() + p.out);
+                const cinS = fDate(cin), coutS = fDate(cout);
+                const dateFmt = shortD(cin, cout);
+                
+                const bcom = `https://www.booking.com/searchresults.html?aid=304142&ss=Haad+Rin&dest_id=900050772&dest_type=city&checkin=${cinS}&checkout=${coutS}&group_adults=${gst}&no_rooms=1&group_children=0&order=price`;
+                const hw = `https://www.hostelworld.com/pwa/s?q=Koh%20Phangan,%20Thailand&country=Thailand&city=Koh%20Phangan&type=city&id=2017&from=${cinS}&to=${coutS}&guests=${gst}&district=232&page=1&sort=lowestprice`;
+                
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-1 bg-slate-900 border border-slate-700 py-0.5 px-1 rounded shadow-sm'; // Tight padding
+                row.innerHTML = `
+                    <div class="w-12 shrink-0 font-black text-pink-500 text-xs">${p.label}</div>
+                    <div class="w-16 shrink-0 text-slate-300 text-xs font-black font-mono text-center border-l border-slate-800">${dateFmt}</div>
+                    <div class="flex gap-1 flex-grow justify-end">
+                        <a href="${bcom}" target="_blank" onclick="prepParserFocus('auditArea')" class="w-10 py-0.5 bg-blue-600 rounded text-[10px] text-white font-black uppercase text-center flex items-center justify-center shadow">BDC</a>
+                        <a href="${hw}" target="_blank" onclick="window.auditNights = ${p.out - p.in}; prepParserFocus('auditArea')" class="w-10 py-0.5 bg-orange-600 rounded text-[10px] text-white font-black uppercase text-center flex items-center justify-center shadow">HW</a>
+                    </div>`;
+                container.appendChild(row);
+            });
+        };
+
+        function populateDropdown(raw) {
+            const select = document.getElementById('fmSelector'); 
+            select.innerHTML = '<option value="">-- MONTH --</option>';
+            raw.trim().split('\n').forEach(line => {
+                const [date, name] = line.split('|').map(s => s.trim());
+                if (date && name) { const opt = document.createElement('option'); opt.value = date; opt.textContent = name.toUpperCase(); select.appendChild(opt); }
+            });
+        }
+
+        window.saveDates = () => {
+            const btn = document.getElementById('saveDatesBtn');
+            if(btn) btn.innerText = 'SAVING...';
+            const v = document.getElementById('fmDateRaw').value;
+            
+            if (uid) {
+                setDoc(doc(db, "audit_dates", uid), { dates: v }, { merge: true })
+                    .then(() => {
+                        if(btn) {
+                            btn.innerText = 'SAVED!';
+                            btn.classList.replace('bg-green-700', 'bg-emerald-500');
+                            setTimeout(() => {
+                                btn.innerText = 'SAVE DB';
+                                btn.classList.replace('bg-emerald-500', 'bg-green-700');
+                                toggleSettings();
+                            }, 1000);
+                        }
+                    }).catch(e => {
+                        console.error("Save error", e);
+                        if(btn) btn.innerText = 'ERROR (CHECK RULES)';
+                    });
+            } else {
+                populateDropdown(v); 
+                toggleSettings();
+            }
+        };
+
         window.auditParse = () => {
             const rawText = document.getElementById('auditArea').value;
             const container = document.getElementById('auditResults');
-            if (!rawText) return; container.innerHTML = ''; container.classList.remove('hidden');
+            const filtBtn = document.getElementById('btn-filt-cycle');
+            if (!rawText) return; 
+            
+            container.innerHTML = ''; 
+            container.classList.remove('hidden');
+            filtBtn.classList.remove('hidden');
 
             let text = rawText.split(/Available properties you recently viewed|Recently viewed/i)[0];
             const results = [];
@@ -620,63 +677,48 @@
                 container.appendChild(row);
             });
             
-            document.getElementById('auditFilters').classList.remove('hidden');
-            window.filterAudit('all');
+            const states = ['all', 'dorm', 'private'];
+            window.filterAudit(states[window.auditFilterState || 0]);
+        };
+
+        window.cycleAuditFilter = () => {
+            window.auditFilterState = (window.auditFilterState + 1) % 3;
+            const states = ['all', 'dorm', 'private'];
+            const labels = ['ALL', 'DORMS', 'PRIVATE'];
+            
+            const btn = document.getElementById('btn-filt-cycle');
+            btn.innerText = labels[window.auditFilterState];
+            
+            btn.classList.remove('bg-blue-600', 'hover:bg-blue-500', 'bg-indigo-600', 'hover:bg-indigo-500', 'bg-slate-700', 'hover:bg-slate-600');
+            
+            if(window.auditFilterState === 0) btn.classList.add('bg-blue-600', 'hover:bg-blue-500');
+            if(window.auditFilterState === 1) btn.classList.add('bg-indigo-600', 'hover:bg-indigo-500');
+            if(window.auditFilterState === 2) btn.classList.add('bg-slate-700', 'hover:bg-slate-600');
+            
+            window.filterAudit(states[window.auditFilterState]);
         };
 
         window.filterAudit = (type) => {
-            ['all', 'dorm', 'private'].forEach(t => {
-                const btn = document.getElementById('btn-filt-' + t);
-                if (t === type) {
-                    btn.className = "flex-1 text-[10px] py-1 rounded bg-orange-600 text-white font-black uppercase shadow transition-colors";
-                } else {
-                    btn.className = "flex-1 text-[10px] py-1 rounded bg-slate-800 text-slate-400 border border-slate-700 hover:text-white hover:bg-slate-700 font-black uppercase transition-colors";
-                }
-            });
             const rows = document.getElementById('auditResults').children;
             for(let i=0; i<rows.length; i++) {
                 const rowType = rows[i].dataset.type;
                 rows[i].style.display = (type === 'all' || type === rowType) ? 'flex' : 'none';
             }
         };
-
-        window.runMatrixFromSelect = () => {
-            const dateStr = document.getElementById('fmSelector').value, gst = document.getElementById('auditGuests').value, container = document.getElementById('matrixResults');
-            if (!dateStr) return; container.innerHTML = ''; container.classList.remove('hidden');
-            const partyDate = new Date(dateStr);
-            [{label:"1 Nt", in:0, out:1}, {label:"2 Nt", in:-1, out:1}, {label:"3 Nt", in:-1, out:2}, {label:"4 Nt", in:-2, out:2}, {label:"5 Nt", in:-2, out:3}].forEach(p => {
-                const cin = new Date(partyDate); cin.setDate(partyDate.getDate() + p.in);
-                const cout = new Date(partyDate); cout.setDate(partyDate.getDate() + p.out);
-                const cinS = fDate(cin), coutS = fDate(cout);
-                const bcom = `https://www.booking.com/searchresults.html?aid=304142&ss=Haad+Rin&dest_id=900050772&dest_type=city&checkin=${cinS}&checkout=${coutS}&group_adults=${gst}&no_rooms=1&group_children=0&order=price`;
-                const hw = `https://www.hostelworld.com/pwa/s?q=Koh%20Phangan,%20Thailand&country=Thailand&city=Koh%20Phangan&type=city&id=2017&from=${cinS}&to=${coutS}&guests=${gst}&district=232&page=1&sort=lowestprice`;
-                
-                const row = document.createElement('div');
-                row.className = 'flex items-center gap-1 bg-slate-900 border border-slate-700 p-0.5 px-1 rounded-lg shadow-sm';
-                row.innerHTML = `<div class="w-12 shrink-0 whitespace-nowrap font-black text-pink-500 text-xl leading-none">${p.label}</div><div class="flex-grow text-slate-400 text-base font-black font-mono text-center border-l border-slate-800">${cinS.slice(5)} to ${coutS.slice(5)}</div><div class="flex gap-1"><a href="${bcom}" target="_blank" onclick="prepParserFocus('auditArea')" class="w-14 py-1 bg-blue-600 rounded text-[10px] text-white font-black uppercase leading-none text-center">B.com</a><a href="${hw}" target="_blank" onclick="window.auditNights = ${p.out - p.in}; prepParserFocus('auditArea')" class="w-14 py-1 bg-orange-600 rounded text-[10px] text-white font-black uppercase leading-none text-center">HW</a></div>`;
-                container.appendChild(row);
-            });
+        
+        window.clearAudit = () => {
+            document.getElementById('auditArea').value=''; 
+            document.getElementById('auditResults').classList.add('hidden'); 
+            document.getElementById('auditResults').innerHTML='';
+            document.getElementById('btn-filt-cycle').classList.add('hidden');
+            
+            window.auditFilterState = 0;
+            const btn = document.getElementById('btn-filt-cycle');
+            btn.innerText = 'ALL';
+            btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-500', 'bg-slate-700', 'hover:bg-slate-600');
+            btn.classList.add('bg-blue-600', 'hover:bg-blue-500');
         };
 
-        function populateDropdown(raw) {
-            const select = document.getElementById('fmSelector'); select.innerHTML = '<option value="">-- SELECT DATE --</option>';
-            raw.trim().split('\n').forEach(line => {
-                const [date, name] = line.split('|').map(s => s.trim());
-                if (date && name) { const opt = document.createElement('option'); opt.value = date; opt.textContent = name.toUpperCase(); select.appendChild(opt); }
-            });
-        }
-        window.toggleSettings = () => document.getElementById('matrixSettings').classList.toggle('hidden');
-        window.saveDates = () => {
-            const v = document.getElementById('fmDateRaw').value;
-            populateDropdown(v); toggleSettings();
-            if (uid) setDoc(doc(db, "audit_dates", uid), { dates: v }, { merge: true });
-        };
-        window.copyDatesToClipboard = () => {
-            const cin = document.getElementById('checkin').value, cout = document.getElementById('checkout').value;
-            const dummy = document.createElement("textarea"); document.body.appendChild(dummy); dummy.value = `In: ${cin} | Out: ${cout}`; dummy.select(); document.execCommand("copy"); document.body.removeChild(dummy);
-        };
-
-        // PRICER LOGIC
         function buildPercentTable() {
             const tb = document.getElementById('percent-tbody');
             tb.innerHTML = `<tr class="hover:bg-slate-800/40 transition-colors"><td class="p-2 font-bold text-white font-sans">1 Night</td><td class="p-2 text-right text-slate-300 border-r border-slate-700/50" id="base-1">-</td><td class="p-2 bg-indigo-950/5 text-center text-slate-500 italic text-[10px] font-sans">Anchor</td><td class="p-2 bg-indigo-950/5 text-center"><span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-400 font-sans">0%</span></td><td class="p-2 bg-indigo-950/5 border-r border-slate-700/50 text-right font-bold text-indigo-400" id="opt-1">-</td><td class="p-2 bg-emerald-950/5 text-center text-slate-500 italic text-[10px] font-sans">Locked</td><td class="p-2 bg-emerald-950/5 text-right font-bold text-emerald-400" id="custom-1">-</td></tr>`;
@@ -760,7 +802,6 @@
             });
         };
 
-        // OTA CALCULATOR LOGIC
         function initializeEmptyOtaData() {
             let data = {};
             for (let i = 0; i < 12; i++) {
